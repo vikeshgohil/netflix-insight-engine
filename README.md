@@ -146,7 +146,7 @@ streamlit run app.py
 
 **Vikesh Gohil**
 MCA Final Year Student
-📧 your-email@gmail.com
+📧 vikeshkgohil101@gmail.com
 🔗 [LinkedIn](https://linkedin.com/in/vikesh-gohil-538262218)
 🐙 [GitHub](https://github.com/vikeshgohil)
 
