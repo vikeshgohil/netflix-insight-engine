@@ -1,78 +1,107 @@
-import streamlit as st
+import io
 
-def listen_voice():
+
+def listen_voice(audio_file):
+    """
+    Convert browser-recorded audio into text.
+
+    The audio is captured by Streamlit's st.audio_input()
+    in the user's browser and then processed using
+    SpeechRecognition + Google Speech Recognition API.
+    """
+
     try:
         import speech_recognition as sr
     except ImportError:
         return {
-            'success': False,
-            'text': '',
-            'error': 'SpeechRecognition library not installed. Run: pip install SpeechRecognition'
+            "success": False,
+            "text": "",
+            "error": (
+                "SpeechRecognition library not installed. "
+                "Add SpeechRecognition to requirements.txt."
+            )
+        }
+
+    if audio_file is None:
+        return {
+            "success": False,
+            "text": "",
+            "error": "No audio recorded. Please record your voice and try again."
         }
 
     recognizer = sr.Recognizer()
 
     try:
-        with sr.Microphone() as source:
-            recognizer.adjust_for_ambient_noise(source, duration=0.5)
-            audio = recognizer.listen(source, timeout=5, phrase_time_limit=8)
+        # Get audio bytes recorded by Streamlit
+        audio_bytes = audio_file.getvalue()
 
+        if not audio_bytes:
+            return {
+                "success": False,
+                "text": "",
+                "error": "The recorded audio is empty. Please try again."
+            }
+
+        # Convert bytes into an in-memory file
+        audio_buffer = io.BytesIO(audio_bytes)
+
+        # Read the browser-recorded WAV audio
+        with sr.AudioFile(audio_buffer) as source:
+            audio = recognizer.record(source)
+
+        # Convert speech to text using Google Speech Recognition
         text = recognizer.recognize_google(audio)
-        return {
-            'success': True,
-            'text': text.strip(),
-            'error': ''
-        }
 
-    except sr.WaitTimeoutError:
         return {
-            'success': False,
-            'text': '',
-            'error': 'No speech detected. Please click the button and speak clearly.'
+            "success": True,
+            "text": text.strip(),
+            "error": ""
         }
 
     except sr.UnknownValueError:
         return {
-            'success': False,
-            'text': '',
-            'error': 'Could not understand your speech. Please try again in a quieter environment.'
+            "success": False,
+            "text": "",
+            "error": (
+                "Could not understand your speech. "
+                "Please speak clearly and try again."
+            )
         }
 
     except sr.RequestError:
         return {
-            'success': False,
-            'text': '',
-            'error': 'Internet connection required for voice recognition. Please check your connection.'
+            "success": False,
+            "text": "",
+            "error": (
+                "Internet connection is required for voice recognition. "
+                "Please check your connection and try again."
+            )
         }
 
-    except OSError:
+    except ValueError:
         return {
-            'success': False,
-            'text': '',
-            'error': 'Microphone not found. Please check your microphone is connected and working.'
+            "success": False,
+            "text": "",
+            "error": (
+                "The recorded audio format could not be processed. "
+                "Please record again."
+            )
         }
 
     except Exception as e:
         return {
-            'success': False,
-            'text': '',
-            'error': f'Voice recognition error: {str(e)}'
+            "success": False,
+            "text": "",
+            "error": f"Voice recognition error: {str(e)}"
         }
 
 
 def process_voice_result(result):
-    if not result['success']:
-        return None, result['error']
-    return result['text'], None
+    """
+    Process the result returned by listen_voice().
+    """
 
+    if not result["success"]:
+        return None, result["error"]
 
-def is_microphone_available():
-    try:
-        import speech_recognition as sr
-        import pyaudio
-        p = pyaudio.PyAudio()
-        device_count = p.get_device_count()
-        p.terminate()
-        return device_count > 0
-    except Exception:
-        return False
+    return result["text"], None
