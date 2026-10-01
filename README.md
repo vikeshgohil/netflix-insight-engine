@@ -12,7 +12,7 @@ titles using Python, Streamlit, Machine Learning, NLP, AI and Voice Recognition.
 
 ## 🚀 Live Demo
 
-👉 [Click here to open the live app]([https://your-app-name.streamlit.app](https://netflix-insight-engine-vvsagnmuxkbr3kjqwwxuh6.streamlit.app/))
+👉 [Click here to open the live app](https://netflix-insight-engine-vvsagnmuxkbr3kjqwwxuh6.streamlit.app/)
 
 ---
 
